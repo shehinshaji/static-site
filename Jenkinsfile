@@ -27,7 +27,7 @@ pipeline {
             stages {
                     stage("dependency setup") {
                         steps {
-                                sh script: 'apt update && apt install docker.io -y', label: 'dependencies installation'
+                                sh script: 'apt update && apt install docker.io nodejs -y', label: 'dependencies installation'
                         }
                     }
 
