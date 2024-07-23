@@ -27,7 +27,9 @@ pipeline {
             stages {
                     stage("dependency setup") {
                         steps {
-                                sh script: 'apt update && apt install docker.io nodejs -y', label: 'dependencies installation'
+                                sh script: 'apt update && apt install docker.io curl -y', label: 'dependencies installation'
+                                sh script: 'curl -fsSL https://deb.nodesource.com/setup_18.x | bash -'
+                                sh script: 'DEBIAN_FRONTEND=noninteractive apt install -y nodejs'
                         }
                     }
 
