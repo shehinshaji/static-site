@@ -27,7 +27,6 @@ pipeline {
                     stage("dependency setup") {
                         steps {
                                 sh script: 'apt update && apt install docker.io -y', label: 'dependencies installation'
-                            }
                         }
                     }
 
@@ -35,21 +34,18 @@ pipeline {
                         steps {
                                 sh 'sed -i "/^FROM/a LABEL BUILD_ID=${BUILD_ID}" Dockerfile'
                                 sh 'docker build --no-cache -t ${BUILD_ID} .', label: 'docker image build'
-                            }
                         }
                     }
                     stage('docker login and build push') {
                         steps {
                                 sh script: 'docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}', label: 'docker login'
                                 sh script: 'docker push ${BUILD_ID}', label: 'docker image push'
-                            }
                         }
                     }
                     stage("Deploy") {
                         steps {
                                 sh script: 'npm i -g caprover', label: 'caprover installation'
                                 sh script: 'caprover deploy --caproverUrl ${CAPROVER_SERVER} --appToken ${CAPROVER_TOKEN} --appName ${CAPROVER_APP} -i ${BUILD_ID}', label: 'app deployment'
-                            }
                         }
                     }
             }
