@@ -21,7 +21,7 @@ pipeline {
                 docker {
                     image "ubuntu:${IMAGE_TAG}"
                     reuseNode true
-                    args '-u root'
+                    args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
                 }
             }
             stages {
