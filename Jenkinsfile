@@ -32,8 +32,8 @@ pipeline {
 
                     stage("docker image build") {
                         steps {
-                                sh 'sed -i "/^FROM/a LABEL BUILD_ID=${BUILD_ID}" Dockerfile'
-                                sh 'docker build --no-cache -t ${BUILD_ID} .', label: 'docker image build'
+                                sh script: 'sed -i "/^FROM/a LABEL BUILD_ID=${BUILD_ID}" Dockerfile'
+                                sh script: 'docker build --no-cache -t ${BUILD_ID} .', label: 'docker image build'
                         }
                     }
                     stage('docker login and build push') {
