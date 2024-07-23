@@ -21,6 +21,7 @@ pipeline {
                 docker {
                     image "ubuntu:${IMAGE_TAG}"
                     reuseNode true
+                    args '-u root'
                 }
             }
             stages {
