@@ -25,15 +25,11 @@ jobs:
     - name: Preset Image Name
       run: echo "IMAGE_URL=$(echo ${{ secrets.DOCKER_DOMAIN }}/${{ github.event.repository.name }}:$(echo ${{ github.sha }} | cut -c1-7) | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
-    - name: Build and push Docker Image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        file: ./Dockerfile
-        push: true
-        platforms: |
-            linux/amd64
-        tags: ${{ env.IMAGE_URL }}
+    - name: Build the Docker image 
+      run: docker build --no-cache -t ${{ env.IMAGE_URL }}
+
+    - name: Docker Push with specific commit hash
+      run: docker push ${{ env.IMAGE_URL }}
 
     - name: Deploy Image to CapRrover
       uses: caprover/deploy-from-github@v1.1.2
