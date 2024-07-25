@@ -26,7 +26,7 @@ jobs:
       run: echo "IMAGE_URL=$(echo ${{ secrets.DOCKER_DOMAIN }}/${{ github.event.repository.name }}:$(echo ${{ github.sha }} | cut -c1-7) | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
     - name: Build the Docker image 
-      run: docker build --no-cache -t ${{ env.IMAGE_URL }}
+      run: docker build --no-cache -t ${{ env.IMAGE_URL }} .
 
     - name: Docker Push with specific commit hash
       run: docker push ${{ env.IMAGE_URL }}
