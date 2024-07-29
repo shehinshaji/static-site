@@ -2,7 +2,7 @@ name: Build and Deploy Docker Image
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
 
 jobs:
   build_and_deploy:
@@ -30,6 +30,16 @@ jobs:
 
     - name: Docker Push with specific commit hash
       run: docker push ${{ env.IMAGE_URL }}
+
+    - name: Set deployment credentials based on branch
+      run: |
+        if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+          echo "APP_NAME=${{ secrets.APP_NAME_MAIN }}" >> $GITHUB_ENV
+          echo "APP_TOKEN=${{ secrets.APP_TOKEN_MAIN }}" >> $GITHUB_ENV
+        elif [ "${{ github.ref }}" == "refs/heads/dev" ]; then
+          echo "APP_NAME=${{ secrets.APP_NAME_DEV }}" >> $GITHUB_ENV
+          echo "APP_TOKEN=${{ secrets.APP_TOKEN_DEV }}" >> $GITHUB_ENV
+        fi
 
     - name: Deploy Image to CapRrover
       uses: caprover/deploy-from-github@v1.1.2
