@@ -39,12 +39,13 @@ jobs:
     - name: SSH to server and deploy
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USER }}
-        password: ${{ secrets.SSH_PASSWORD }}
-        port: ${{ secrets.SSH_PORT }}
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        port: ${{ secrets.PORT }}
         script: |
           cd ${{ env.DEPLOY_DIR }}
           docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }} ${{ secrets.DOCKER_DOMAIN }}
           docker compose -f docker-compose-cicd.yml down
           DOCKER_IMAGE=${{ env.IMAGE_URL }} docker compose -f docker-compose-cicd.yml up -d
+        debug: true
