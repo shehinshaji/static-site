@@ -40,7 +40,8 @@ jobs:
       run: |
         sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
         cd ${{ env.DEPLOY_DIR }}
+        echo "DOCKER_IMAGE=${{ env.IMAGE_URL }}" >> $GITHUB_ENV
         docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }} ${{ secrets.DOCKER_DOMAIN }}
         docker compose -f docker-compose-cicd.yml down
-        DOCKER_IMAGE=${{ env.IMAGE_URL }} docker compose -f docker-compose-cicd.yml up -d
+        ${{ env.DOCKER_IMAGE }} docker compose -f docker-compose-cicd.yml up -d
         EOF
