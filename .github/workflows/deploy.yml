@@ -25,8 +25,12 @@ jobs:
     - name: Build the Docker image 
       run: docker build --no-cache -t ${{ env.IMAGE_URL }} .
 
-    - name: Docker Push with specific commit hash
-      run: docker push ${{ env.IMAGE_URL }}
+    - name: Docker Push with specific commit hash with retries
+      run: |
+        (echo "===== Docker Push Attempt: 1 ====" && docker push ${{ env.IMAGE_URL }}) || \
+        (echo "===== Docker Push Attempt: 2 ====" && docker push ${{ env.IMAGE_URL }}) || \
+        (echo "===== Docker Push Attempt: 3 ====" && docker push ${{ env.IMAGE_URL }}) || \
+        (echo "===== Docker Push failed...  ====" && exit 1)
 
     - name: Set deployment credentials based on branch
       run: |
@@ -40,8 +44,6 @@ jobs:
       run: |
         sshpass -p '${{ secrets.PASSWORD }}' ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
         cd ${{ env.DEPLOY_DIR }}
-        ls
-        pwd
         docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }} ${{ secrets.DOCKER_DOMAIN }}
         export DOCKER_IMAGE=${{ env.IMAGE_URL }}
         docker compose -f docker-compose-cicd.yml down
