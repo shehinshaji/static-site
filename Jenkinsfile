@@ -32,6 +32,20 @@ pipeline {
                         }
                     }
 
+                    stage('Install Trivy') {
+                        steps {
+                            script {
+                                sh '''
+                                sudo apt-get install wget apt-transport-https gnupg lsb-release
+                                wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+                                echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+                                sudo apt-get update
+                                sudo apt-get install trivy
+                                '''
+                            }
+                        }
+                    }
+
                     stage("docker image build") {
                         steps {
                                 sh script: 'sed -i "/^FROM/a LABEL BUILD_ID=${BUILD_ID}" Dockerfile'
@@ -39,15 +53,20 @@ pipeline {
                         }
                     }
                     
-                    stage("test stage") {
+                    stage('Scan Docker Image for Vulnerabilities') {
                         steps {
-                                sh script: 'pwd && ls'
+                            script {
+                                sh 'trivy image -f json -o trivy-report.json ${BUILD_ID}'
+                            }
                         }
                     }
 
                     stage("Dependency Check") {
                         steps {
                             dependencyCheck additionalArguments: '--scan ./ --format JSON --out ./dependency-check-report.json', odcInstallation: 'OWASP Dependency-Check'
+                            dependencyCheck additionalArguments: '--scan ./ --format XML --out ./dependency-check-report.xml', odcInstallation: 'OWASP Dependency-Check'
+                            
+                            dependencyCheckPublisher pattern: 'dependency-check-report.xml'
                         }
                     }
                
@@ -61,6 +80,16 @@ pipeline {
                             enabledForFailure: true,
                             aggregatingResults: true,
                             tools: [owaspDependencyCheck(pattern: '**/dependency-check-report.json')],
+                            qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]]
+                        )
+                    }
+                    
+                    withChecks('trivy-scan') {
+                        recordIssues(
+                            publishAllIssues: true,
+                            enabledForFailure: true,
+                            aggregatingResults: true,
+                            tools: [trivy(pattern: '**/trivy-report.json')],
                             qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]]
                         )
                     }
