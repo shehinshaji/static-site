@@ -9,11 +9,6 @@ pipeline {
             APP_NAME = "${env.MY_APP_NAME}"
             BUILD_ID = "${APP_NAME}:${BUILD_NUMBER}"
             IMAGE_TAG = "latest"
-            CAPROVER_SERVER = "${env.CAPROVER_SERVER}"
-            CAPROVER_TOKEN = "${env.CAPROVER_TOKEN}"
-            CAPROVER_APP = "${env.CAPROVER_APP}"
-            DOCKER_USER = "${env.DOCKER_USER}"
-            DOCKER_PASSWORD = "${env.DOCKER_PASSWORD}"
         }
     stages {
         stage("Analysis") {
@@ -39,19 +34,35 @@ pipeline {
                                 sh script: 'docker build --no-cache -t ${BUILD_ID} .', label: 'docker image build'
                         }
                     }
-                    stage('docker login and build push') {
+                    
+                    stage("test stage") {
                         steps {
-                                sh script: 'docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}', label: 'docker login'
-                                sh script: 'docker push ${BUILD_ID}', label: 'docker image push'
+                                sh script: 'pwd && ls'
                         }
                     }
-                    stage("Deploy") {
+
+                    stage("Dependency Check") {
                         steps {
-                                sh script: 'npm i -g caprover', label: 'caprover installation'
-                                sh script: 'caprover deploy --caproverUrl ${CAPROVER_SERVER} --appToken ${CAPROVER_TOKEN} --appName ${CAPROVER_APP} -i ${BUILD_ID}', label: 'app deployment'
+                            dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'OWASP Dependency-Check'
                         }
                     }
+               
             }
+                  
+            post {
+                always {
+                    withChecks('dependency-check') {
+                        recordIssues(
+                            publishAllIssues: true,
+                            enabledForFailure: true,
+                            aggregatingResults: true,
+                            tools: [owaspDependencyCheck(pattern: '**/dependency-check-report.xml')],
+                            qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]]
+                        )
+                    }
+                }
+            }  
+
         }
     }
 
