@@ -17,7 +17,7 @@ pipeline {
                 docker {
                     image "ubuntu:${IMAGE_TAG}"
                     reuseNode true
-                    args '-u root -v /opt/java:/opt/java -v /var/run/docker.sock:/var/run/docker.sock -v /var/jenkins_home:/var/jenkins_home'
+                    args '-u root -v /opt/java:/opt/java -v /var/run/docker.sock:/var/run/docker.sock -v /var/jenkins_home/tools:/var/jenkins_home/tools'
                 }
             }
             stages {
