@@ -9,7 +9,7 @@ pipeline {
             APP_NAME = "${env.MY_APP_NAME}"
             BUILD_ID = "${APP_NAME}:${BUILD_NUMBER}"
             IMAGE_TAG = "latest"
-            JAVA_HOME = "/opt/java/openjdk" 
+//            JAVA_HOME = "/opt/java/openjdk" 
         }
     stages {
         stage("Analysis") {
@@ -47,7 +47,7 @@ pipeline {
 
                     stage("Dependency Check") {
                         steps {
-                            dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'OWASP Dependency-Check'
+                            dependencyCheck additionalArguments: '--scan ./ --format JSON --out ./dependency-check-report.json', odcInstallation: 'OWASP Dependency-Check'
                         }
                     }
                
@@ -60,7 +60,7 @@ pipeline {
                             publishAllIssues: true,
                             enabledForFailure: true,
                             aggregatingResults: true,
-                            tools: [owaspDependencyCheck(pattern: '**/dependency-check-report.xml')],
+                            tools: [owaspDependencyCheck(pattern: '**/dependency-check-report.json')],
                             qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]]
                         )
                     }
