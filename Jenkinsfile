@@ -22,9 +22,12 @@ pipeline {
             stages {
                     stage("dependency setup") {
                         steps {
-                                sh script: 'apt update && apt install docker.io curl -y', label: 'dependencies installation'
+                                sh script: 'apt update && apt install docker.io curl openjdk-11-jdk -y', label: 'dependencies installation'
                                 sh script: 'curl -fsSL https://deb.nodesource.com/setup_18.x | bash -'
                                 sh script: 'DEBIAN_FRONTEND=noninteractive apt install -y nodejs'
+                                sh script: 'echo 'export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64' >> ~/.bashrc'
+                                sh script: 'echo 'export PATH=$JAVA_HOME/bin:$PATH' >> ~/.bashrc'
+                                sh script: 'source ~/.bashrc'
                         }
                     }
 
