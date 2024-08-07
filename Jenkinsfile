@@ -64,9 +64,15 @@ pipeline {
                     stage("Dependency Check") {
                         steps {
                             dependencyCheck additionalArguments: '--scan ./ --format JSON --out ./dependency-check-report.json', odcInstallation: 'OWASP Dependency-Check'
-                            dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'OWASP Dependency-Check'
+                            dependencyCheck additionalArguments: ''' 
+                                        -o './'
+                                        -s './'
+                                        -f 'ALL' 
+                                        --prettyPrint''', odcInstallation: 'OWASP Dependency-Check'
+        
                             
                             dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+                            dependencyCheckPublisher pattern: 'dependency-check-report.json'
                         }
                     }
                
