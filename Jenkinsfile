@@ -72,7 +72,7 @@ pipeline {
         
                             
                             dependencyCheckPublisher pattern: 'dependency-check-report.xml'
-                            dependencyCheckPublisher pattern: 'dependency-check-report.json'
+                            dependencyCheckPublisher pattern: 'dependency-check-report.html'
                         }
                     }
                
