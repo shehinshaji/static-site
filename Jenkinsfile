@@ -108,8 +108,8 @@ pipeline {
         always {
         emailext (
             subject: "$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!",
-            body: "$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:
-                   Check console output at $BUILD_URL to view the results.",
+            body: """$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:
+                     Check console output at $BUILD_URL to view the results.""",
             recipientProviders: [developers(), requestor()],
             to: "$DEFAULT_RECIPIENTS"  // Add the default recipients token
         )
