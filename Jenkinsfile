@@ -9,11 +9,7 @@ pipeline {
             APP_NAME = "${env.MY_APP_NAME}"
             BUILD_ID = "${APP_NAME}:${BUILD_NUMBER}"
             IMAGE_TAG = "latest"
-            CAPROVER_SERVER = "${env.CAPROVER_SERVER}"
-            CAPROVER_TOKEN = "${env.CAPROVER_TOKEN}"
-            CAPROVER_APP = "${env.CAPROVER_APP}"
-            DOCKER_USER = "${env.DOCKER_USER}"
-            DOCKER_PASSWORD = "${env.DOCKER_PASSWORD}"
+//            JAVA_HOME = "/opt/java/openjdk" 
         }
     stages {
         stage("Analysis") {
@@ -21,15 +17,32 @@ pipeline {
                 docker {
                     image "ubuntu:${IMAGE_TAG}"
                     reuseNode true
-                    args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
+                    args '-u root -v /opt/java:/opt/java -v /var/run/docker.sock:/var/run/docker.sock -v /var/jenkins_home/tools:/var/jenkins_home/tools'
                 }
             }
             stages {
                     stage("dependency setup") {
                         steps {
-                                sh script: 'apt update && apt install docker.io curl -y', label: 'dependencies installation'
+                                sh script: 'apt update && apt install docker.io curl openjdk-11-jdk -y', label: 'dependencies installation'
                                 sh script: 'curl -fsSL https://deb.nodesource.com/setup_18.x | bash -'
                                 sh script: 'DEBIAN_FRONTEND=noninteractive apt install -y nodejs'
+//                                sh script: "echo 'export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64' >> ~/.bashrc"
+//                                sh script: "echo 'export PATH=$JAVA_HOME/bin:$PATH' >> ~/.bashrc"
+//                                sh script: 'source ~/.bashrc'
+                        }
+                    }
+
+                    stage('Install Trivy') {
+                        steps {
+                            script {
+                                sh '''
+                                apt-get install wget apt-transport-https gnupg lsb-release -y
+                                wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | tee /usr/share/keyrings/trivy.gpg > /dev/null
+                                echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | tee -a /etc/apt/sources.list.d/trivy.list
+                                apt-get update -y
+                                apt-get install trivy -y
+                                '''
+                            }
                         }
                     }
 
@@ -39,23 +52,68 @@ pipeline {
                                 sh script: 'docker build --no-cache -t ${BUILD_ID} .', label: 'docker image build'
                         }
                     }
-                    stage('docker login and build push') {
+                    
+                    stage('Scan Docker Image for Vulnerabilities') {
                         steps {
-                                sh script: 'docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}', label: 'docker login'
-                                sh script: 'docker push ${BUILD_ID}', label: 'docker image push'
+                            script {
+                                sh 'trivy image -f json -o trivy-report.json ${BUILD_ID}'
+                            }
                         }
                     }
-                    stage("Deploy") {
+
+                    stage("Dependency Check") {
                         steps {
-                                sh script: 'npm i -g caprover', label: 'caprover installation'
-                                sh script: 'caprover deploy --caproverUrl ${CAPROVER_SERVER} --appToken ${CAPROVER_TOKEN} --appName ${CAPROVER_APP} -i ${BUILD_ID}', label: 'app deployment'
+                            dependencyCheck additionalArguments: '--scan ./ --format JSON --out ./dependency-check-report.json', odcInstallation: 'OWASP Dependency-Check'
+                            dependencyCheck additionalArguments: ''' 
+                                        -o './'
+                                        -s './'
+                                        -f 'ALL' 
+                                        --prettyPrint''', odcInstallation: 'OWASP Dependency-Check'
+        
+                            
+                            dependencyCheckPublisher pattern: 'dependency-check-report.xml'
                         }
                     }
+               
             }
+                  
+            post {
+                always {
+                    withChecks('dependency-check') {
+                        recordIssues(
+                            publishAllIssues: true,
+                            enabledForFailure: true,
+                            aggregatingResults: true,
+                            tools: [owaspDependencyCheck(pattern: '**/dependency-check-report.json')],
+                            qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]]
+                        )
+                    }
+                    
+                    withChecks('trivy-scan') {
+                        recordIssues(
+                            publishAllIssues: true,
+                            enabledForFailure: true,
+                            aggregatingResults: true,
+                            tools: [trivy(pattern: '**/trivy-report.json')],
+                            qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]]
+                        )
+                    }
+                }
+            }  
+
         }
     }
 
     post {
+        always {
+        emailext (
+            subject: "${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - ${env.BUILD_STATUS}!",
+            body: """${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - ${env.BUILD_STATUS}:
+                     Check console output at ${env.BUILD_URL} to view the results.""",
+            recipientProviders: [developers(), requestor()],
+            to: "${env.DEFAULT_RECIPIENTS}"  // Add default recipients token
+        )
+    }
         cleanup {
             sh 'docker rmi $(docker images -q -f "label=BUILD_ID=${BUILD_ID}")'
             cleanWs deleteDirs: true
