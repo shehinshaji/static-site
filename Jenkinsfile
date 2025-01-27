@@ -74,6 +74,33 @@ pipeline {
                             dependencyCheckPublisher pattern: 'dependency-check-report.xml'
                         }
                     }
+                                      
+                    stage('Feature branch Trigger') {
+                        when {
+                           branch "test/email"
+                        }
+                        steps {
+                                sh 'echo "Trigger on Feature branch." '
+                        }
+                    }
+
+                    stage('Dev branch Trigger') {
+                        when {
+                           branch "dev"
+                        }
+                        steps {
+                                sh 'echo "Trigger on develop branch." '
+                        }
+                    }
+ 
+                    stage('Main branch Trigger') {
+                        when {
+                           branch "main"
+                        }
+                        steps {
+                                sh 'echo "Trigger on main branch." '
+                        }
+                    }
                
             }
                   
@@ -105,15 +132,6 @@ pipeline {
     }
 
     post {
-        always {
-        emailext (
-            subject: "${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - ${env.BUILD_STATUS}!",
-            body: """${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - ${env.BUILD_STATUS}:
-                     Check console output at ${env.BUILD_URL} to view the results.""",
-            recipientProviders: [developers(), requestor()],
-            to: "${env.DEFAULT_RECIPIENTS}"  // Add the default recipients token
-        )
-    }
         cleanup {
             sh 'docker rmi $(docker images -q -f "label=BUILD_ID=${BUILD_ID}")'
             cleanWs deleteDirs: true
