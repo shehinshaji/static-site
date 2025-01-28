@@ -135,11 +135,11 @@ pipeline {
         always {
         emailext (
             mimeType: 'text/html',
-            subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!',
-            body: 'Hi Team,\nPlease Find the Below Deployment Pipeline Execution Informations\n' +
-            '<b>Project: $PROJECT_NAME - Build No.: # $BUILD_NUMBER - Build Status: $BUILD_STATUS</b>' +
-            '\nCheck console output at $BUILD_URL to view the results.\n' +
-            '\nThank You,\nMykare Devops Team.',
+            subject: 'DEPLOYMENT OF $PROJECT_NAME - WITH BUILD ID: $BUILD_NUMBER $BUILD_STATUS!',
+            body: 'Hi Team,<br>Please find the below deployment pipeline execution details:<br><br>' +
+            '<b>Project: $PROJECT_NAME - Build No.: # $BUILD_NUMBER - Build Status: $BUILD_STATUS</b><br>' +
+            '<br>Check console output at $BUILD_URL to view the results.<br>' +
+            '<br>Thank You,<br>Mykare Devops Team.',
             recipientProviders: [developers(), requestor()],
             to: '$DEFAULT_RECIPIENTS'  // Add the default recipients token
         )
