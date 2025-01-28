@@ -138,7 +138,7 @@ pipeline {
             body: """${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - ${env.BUILD_STATUS}:
                      Check console output at ${env.BUILD_URL} to view the results.""",
             recipientProviders: [developers(), requestor()],
-            to: "${DEFAULT_RECIPIENTS}"  // Add the default recipients token
+            to: "$DEFAULT_RECIPIENTS"  // Add the default recipients token
         )
     }
         cleanup {
