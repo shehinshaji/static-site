@@ -141,9 +141,10 @@ pipeline {
                   .replace('%2F', '/')     // Decode URL-encoded slashes
 
               // Define message
-              def message = "Deployment of ${formattedProjectName} - With Build ID: $BUILD_NUMBER: $BUILD_STATUS!"
+              def message = 'Deployment of ${formattedProjectName} - With Build ID: $BUILD_NUMBER: $BUILD_STATUS!'
               emailext (
                   mimeType: 'text/html',
+                  subject: message,
                   //subject: 'Deployment of $PROJECT_NAME - With Build ID: $BUILD_NUMBER: $BUILD_STATUS!',
                   //subject: "Deployment of ${env.JOB_NAME.toUpperCase()} - With Build ID: ${env.BUILD_NUMBER}: ${currentBuild.result.toUpperCase()}!",
                   body: 'Hi Team,<br>Please find the below deployment pipeline execution details:<br><br>' +
