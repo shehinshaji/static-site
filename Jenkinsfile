@@ -132,6 +132,15 @@ pipeline {
     }
 
     post {
+        always {
+        emailext (
+            subject: "${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - ${env.BUILD_STATUS}!",
+            body: """${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - ${env.BUILD_STATUS}:
+                     Check console output at ${env.BUILD_URL} to view the results.""",
+            recipientProviders: [developers(), requestor()],
+            to: "${env.DEFAULT_RECIPIENTS}"  // Add the default recipients token
+        )
+    }
         cleanup {
 //            sh 'docker rmi $(docker images -q -f "label=BUILD_ID=${BUILD_ID}")'
             cleanWs deleteDirs: true
