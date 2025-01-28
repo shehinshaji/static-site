@@ -139,6 +139,7 @@ pipeline {
                   .replace('-', ' ')       // Replace hyphens with spaces
                   .replace(' ', ' » ')     // Replace spaces with " » "
                   .replace('%2F', '/')     // Decode URL-encoded slashes
+                  .toUpperCase()           // Convert the formatted name to uppercase
 
               // Define message
               def message = "Deployment of ${formattedProjectName} - With Build ID: ${env.BUILD_NUMBER}: ${currentBuild.result.toUpperCase()}!"
