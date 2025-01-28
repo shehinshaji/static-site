@@ -137,8 +137,10 @@ pipeline {
             //subject: "${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - ${env.BUILD_STATUS}!",
             subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!',
             //body: """${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - ${env.BUILD_STATUS}:
-            body: 'Project: $PROJECT_NAME - Build No.: # $BUILD_NUMBER - Build Status: $BUILD_STATUS:' +
-            '\nCheck console output at $BUILD_URL to view the results.',
+            body: 'Hi Team,\nPlease Find the Below Deployment Pipeline Execution Informations' +
+            '\n<b>Project: $PROJECT_NAME - Build No.: # $BUILD_NUMBER - Build Status: $BUILD_STATUS:</b>' +
+            '\nCheck console output at $BUILD_URL to view the results.' +
+            '\nThank You,\nMykare Devops Team.',
             recipientProviders: [developers(), requestor()],
             to: '$DEFAULT_RECIPIENTS'  // Add the default recipients token
         )
