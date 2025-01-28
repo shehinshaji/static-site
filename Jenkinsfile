@@ -133,17 +133,27 @@ pipeline {
 
     post {
         always {
-        emailext (
-            mimeType: 'text/html',
-            subject: 'Deployment of <p style="text-transform: uppercase;">$PROJECT_NAME</p> - With Build ID: $BUILD_NUMBER: $BUILD_STATUS!',
-            //subject: "Deployment of ${env.JOB_NAME.toUpperCase()} - With Build ID: ${env.BUILD_NUMBER}: ${currentBuild.result.toUpperCase()}!",
-            body: 'Hi Team,<br>Please find the below deployment pipeline execution details:<br><br>' +
-            '<b>Project: $PROJECT_NAME - Build No.: # $BUILD_NUMBER - Build Status: $BUILD_STATUS</b><br>' +
-            '<br>Check console output at $BUILD_URL to view the results.<br>' +
-            '<br>Thank You,<br>Mykare Devops Team.',
-            recipientProviders: [developers(), requestor()],
-            to: '$DEFAULT_RECIPIENTS'  // Add the default recipients token
-        )
+          script {
+              // Format project name
+              def formattedProjectName = "$PROJECT_NAME"
+                  .replace('-', ' ')       // Replace hyphens with spaces
+                  .replace(' ', ' » ')     // Replace spaces with " » "
+                  .replace('%2F', '/')     // Decode URL-encoded slashes
+
+              // Define message
+              def message = "Deployment of ${formattedProjectName} - With Build ID: $BUILD_NUMBER: $BUILD_STATUS!"
+              emailext (
+                  mimeType: 'text/html',
+                  //subject: 'Deployment of $PROJECT_NAME - With Build ID: $BUILD_NUMBER: $BUILD_STATUS!',
+                  //subject: "Deployment of ${env.JOB_NAME.toUpperCase()} - With Build ID: ${env.BUILD_NUMBER}: ${currentBuild.result.toUpperCase()}!",
+                  body: 'Hi Team,<br>Please find the below deployment pipeline execution details:<br><br>' +
+                  '<b>Project: $PROJECT_NAME - Build No.: # $BUILD_NUMBER - Build Status: $BUILD_STATUS</b><br>' +
+                  '<br>Check console output at $BUILD_URL to view the results.<br>' +
+                  '<br>Thank You,<br>Mykare Devops Team.',
+                  recipientProviders: [developers(), requestor()],
+                  to: '$DEFAULT_RECIPIENTS'  // Add the default recipients token
+              )
+          }  
     }
         cleanup {
 //            sh 'docker rmi $(docker images -q -f "label=BUILD_ID=${BUILD_ID}")'
