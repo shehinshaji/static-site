@@ -137,8 +137,8 @@ pipeline {
             //subject: "${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - ${env.BUILD_STATUS}!",
             subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!',
             //body: """${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - ${env.BUILD_STATUS}:
-            body: 'Project: $PROJECT_NAME - Build No.: # $BUILD_NUMBER - Build Status: $BUILD_STATUS:',
-            //Check console output at ${env.BUILD_URL} to view the results.""",
+            body: 'Project: $PROJECT_NAME - Build No.: # $BUILD_NUMBER - Build Status: $BUILD_STATUS:' +
+            '\nCheck console output at $BUILD_URL to view the results.',
             recipientProviders: [developers(), requestor()],
             to: '$DEFAULT_RECIPIENTS'  // Add the default recipients token
         )
