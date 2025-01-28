@@ -135,8 +135,8 @@ pipeline {
         always {
         emailext (
             mimeType: 'text/html',
-            //subject: 'Deployment of $PROJECT_NAME - With Build ID: $BUILD_NUMBER: $BUILD_STATUS!',
-            subject: "Deployment of ${env.JOB_NAME.toUpperCase()} - With Build ID: ${env.BUILD_NUMBER}: ${currentBuild.result.toUpperCase()}!",
+            subject: 'Deployment of <p style="text-transform: uppercase;">$PROJECT_NAME</p> - With Build ID: $BUILD_NUMBER: $BUILD_STATUS!',
+            //subject: "Deployment of ${env.JOB_NAME.toUpperCase()} - With Build ID: ${env.BUILD_NUMBER}: ${currentBuild.result.toUpperCase()}!",
             body: 'Hi Team,<br>Please find the below deployment pipeline execution details:<br><br>' +
             '<b>Project: $PROJECT_NAME - Build No.: # $BUILD_NUMBER - Build Status: $BUILD_STATUS</b><br>' +
             '<br>Check console output at $BUILD_URL to view the results.<br>' +
