@@ -135,7 +135,7 @@ pipeline {
         always {
           script {
               // Format project name
-              def formattedProjectName = "$PROJECT_NAME"
+              def formattedProjectName = '$PROJECT_NAME'
                   .replace('-', ' ')       // Replace hyphens with spaces
                   .replace(' ', ' » ')     // Replace spaces with " » "
                   .replace('%2F', '/')     // Decode URL-encoded slashes
