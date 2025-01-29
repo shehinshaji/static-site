@@ -169,7 +169,7 @@ pipeline {
                   '<br>Thank You,<br>Mykare Devops Team.',
                   recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']]
                   //recipientProviders: [culprits()],
-                  //to: '$DEFAULT_RECIPIENTS'  //.Add the default recipients token
+                  //to: '$DEFAULT_RECIPIENTS'  //Add the default recipients token
               )
           }  
     }
