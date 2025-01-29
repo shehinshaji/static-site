@@ -101,6 +101,12 @@ pipeline {
                                 sh 'echo "Trigger on main branch." '
                         }
                     }
+ 
+                    stage('git commit log check') {
+                        steps {
+                                sh 'git log -1 --pretty=fuller'
+                        }
+                    }
                
             }
                   
