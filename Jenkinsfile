@@ -137,8 +137,8 @@ pipeline {
               // Format project name
               def formattedProjectName = "${env.JOB_NAME}"
                   .replace('%2F', '/')     // Decode URL-encoded slashes first
-                  .replaceAll('-(?![^/]*$)', ' ')  // Replace hyphens with spaces EXCEPT before the last slash part
-                  .replace(' ', ' » ')     // Convert spaces to " » "
+                  .replaceAll('-(?=.*?/)', '')  // Remove hyphens ONLY before slashes
+                  .replace(' ', ' » ')     // Convert remaining spaces to " » "
                   .toUpperCase()           // Convert the formatted name to uppercase
 
               // Define message
