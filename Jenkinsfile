@@ -152,8 +152,8 @@ pipeline {
                   '<b>Project: $PROJECT_NAME - Build No.: # $BUILD_NUMBER - Build Status: $BUILD_STATUS</b><br>' +
                   '<br>Check console output at $BUILD_URL to view the results.<br>' +
                   '<br>Thank You,<br>Mykare Devops Team.',
-                  recipientProviders: [culprits(), developers(), upstreamDevelopers(), contributor()],
-                  to: '$DEFAULT_RECIPIENTS'  // Add the default recipients token
+                  recipientProviders: [culprits()],
+                  //to: '$DEFAULT_RECIPIENTS'  // Add the default recipients token
               )
           }  
     }
