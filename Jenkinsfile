@@ -101,6 +101,15 @@ pipeline {
                                 sh 'echo "Trigger on main branch." '
                         }
                     }
+
+                    stage('Check Developers') {
+                        steps {
+                           script {
+                               def devs = emailextrecipients([developers(), requestor()])
+                               echo "Detected Developers: ${devs}"
+                           }
+                        }
+                    }
  
                     stage('git commit log check') {
                         steps {
