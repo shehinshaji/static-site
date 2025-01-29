@@ -111,11 +111,11 @@ pipeline {
                         }
                     }
  
-                    stage('git commit log check') {
-                        steps {
-                                sh "apt update && apt install git -y && git config --global --add safe.directory ${env.WORKSPACE} && git log -1 --pretty=fuller"
-                        }
-                    }
+//                    stage('git commit log check') {
+//                        steps {
+//                                sh "apt update && apt install git -y && git config --global --add safe.directory ${env.WORKSPACE} && git log -1 --pretty=fuller"
+//                        }
+//                    }
                
             }
                   
