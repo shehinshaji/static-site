@@ -136,13 +136,13 @@ pipeline {
           script {
               // Format project name
               def formattedProjectName = "${env.JOB_NAME}"
-                  .replace('-', ' ')       // Replace hyphens with spaces
-                  .replace(' ', ' » ')     // Replace spaces with " » "
-                  .replace('%2F', '/')     // Decode URL-encoded slashes
+                  .replace('%2F', '/')     // Decode URL-encoded slashes first
+                  .replaceAll('-(?![^/]*$)', ' ')  // Replace hyphens with spaces EXCEPT before the last slash part
+                  .replace(' ', ' » ')     // Convert spaces to " » "
                   .toUpperCase()           // Convert the formatted name to uppercase
 
               // Define message
-              def message = "Deployment of ${formattedProjectName.toUpperCase()} - With Build ID: ${env.BUILD_NUMBER}: ${currentBuild.result.toUpperCase()}!"
+              def message = "Deployment of ${formattedProjectName} - With Build ID: ${env.BUILD_NUMBER}: ${currentBuild.result.toUpperCase()}!"
               emailext (
                   mimeType: 'text/html',
                   subject: message,
