@@ -134,7 +134,7 @@ pipeline {
     post {
         always {
           script {
-              // Format project name.
+              // .Format project name.
               def formattedProjectName = "${env.JOB_NAME}"
                   .replace('%2F', '/')     // Decode URL-encoded slashes first
                   .replaceAll('-(?=.*?/)', '')  // Remove hyphens ONLY before slashes
