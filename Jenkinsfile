@@ -153,7 +153,7 @@ pipeline {
                   '<br>Check console output at $BUILD_URL to view the results.<br>' +
                   '<br>Thank You,<br>Mykare Devops Team.',
                   recipientProviders: [culprits()],
-                  //to: '$DEFAULT_RECIPIENTS'  // Add the default recipients token
+                  //to: '$DEFAULT_RECIPIENTS'  // Add. the default recipients token
               )
           }  
     }
