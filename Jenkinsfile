@@ -104,7 +104,7 @@ pipeline {
  
                     stage('git commit log check') {
                         steps {
-                                sh 'git log -1 --pretty=fuller'
+                                sh 'apt update && apt install git -y && git log -1 --pretty=fuller'
                         }
                     }
                
